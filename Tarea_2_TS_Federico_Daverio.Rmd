@@ -1,0 +1,142 @@
+---
+title: "Tarea 2 TS"
+author: "Federico Daverio"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    number_sections: no
+    theme: united
+    highlight: tango
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list = ls())
+options(scipen=999) 
+memory.limit(size=56000)
+library(tidyverse)
+library(stargazer)
+library(Synth)
+library(ggplot2)
+library(readxl)
+library(xts)
+setwd('C:/DAVE2/CIDE/4 semestre/Time series/Tarea_2')
+```
+
+
+# Ejercicio 1
+Importar la base de datos INPC como logarítmica, convertirla a serie de tiempo y graficarla (la serie comienza en enero de 1969). Descargue los datos de:
+https://www.inegi.org.mx/sistemas/bie/
+
+Importamos los datos averiguando las variables presentes y formateandolos como series de tiempo mensil.
+
+```{r}
+INPC<- log(read_excel("./BIE_BIE20210207133327.xls", range="b1:b625",col_names = TRUE))
+names(INPC) <- "INPC"
+INPC1 <- xts(x =INPC , order.by = seq(as.Date("1969-01-01"), length = nrow(INPC), by = "month"))
+```
+
+Ploteamos la serie completa
+
+```{r}
+plot(INPC1)
+```
+
+# Ejercicio 2
+Partir la serie en 2
+
+## Inciso A
+Tomar una parte de la serie de tiempo que comience en enero 1969 y termine
+en Diciembre 2000, calcular sus tasas anuales y convertirla a serie de tiempo 
+Dividimos la serie en dos partes como indicado y ploteamos las dos series separadas
+
+
+```{r}
+sub1_INPC <- INPC1["196901/20001201"]
+sub2_INPC <- INPC1["20010101/20201201"]
+plot(sub1_INPC)
+plot(sub2_INPC)
+```
+
+
+
+## Inciso B
+Tomar una parte de la serie de tiempo que comience en enero 2001 y termine
+en el año 2020, calcular sus tasas anuales y convertirla a serie de tiempo
+
+Calculamos las tasas anuales y graficamos ambas
+
+
+```{r}
+yoy_1 <- (as.numeric(sub1_INPC["197001/200012"]) - as.numeric(sub1_INPC["196901/199912"]))*100
+yoy_1 <- xts(x = yoy_1, order.by = seq(as.Date("1969-01-01"), length =NROW(yoy_1), by = "month"))
+plot(yoy_1)
+
+yoy_2 <- (as.numeric(sub2_INPC["200201/202012"]) - as.numeric(sub2_INPC["200101/201912"]))*100
+yoy_2 <- xts(x = yoy_2, order.by = seq(as.Date("2001-01-01"), length =NROW(yoy_2), by = "month"))
+plot(yoy_2)
+
+```
+
+
+## Inciso C
+¿Por qué deberíamos de usar la segunda serie de tiempo (Ene 2001- Jun 2020)? Justificación económica. 
+
+La segunda serie de tiempo tiene el año base y puede darnos una mayor visión con respecto a los cambios que son relativos a los ultimos años. De la grafica de la serie completa podemos notar que esta se estabiliza en los ultimos años. Esto se debe principalmente a la politica del Banco de Mexico enfocada en la definición de una tasa de inflación objetivo relativamente constante en los años. Por lo tanto también economicamente nos puede dar mayores informaciónes y capaicdad predictiva la segunda serie.
+
+
+# Ejercicio 3
+En un ciclo cambiar el año base de Julio 2018 a mayo 2020 (utilizando la serie de tiempo de Ene 2001-Jun 2020)
+
+## Inciso A
+Grafíquela 
+
+```{r}
+INPC2<- read_excel("./BIE_BIE20210207133327.xls", range="b1:b625",col_names = TRUE)
+names(INPC2) <- "INPC2"
+INPC2 <- xts(x =INPC2 , order.by = seq(as.Date("1969-01-01"), length = nrow(INPC2), by = "month"))
+sub_INPC2 <- INPC2["20010101/20201201"]
+INPCMay19 <- (sub_INPC2/106.162)*100 #106.16200 is  May 2020 INPC
+plot(INPCMay19)
+```
+
+## Inciso B
+Vuelva la serie a logarítmica y calcule las tasas de crecimiento entre periodos
+
+```{r}
+INPCMay19 <-log(INPCMay19)
+MoM<-(as.numeric(INPCMay19)-as.numeric(stats::lag(INPCMay19)))*100
+MoM <- xts(x = MoM, order.by = seq(as.Date("2001-01-01"), length =NROW(MoM), by = "month"))
+plot(MoM)
+```
+
+
+## Inciso C
+¿Qué tan distintas serían las tasas mensuales si se calcularán con la serie año base Julio 2018 y año base mayo 2020? 
+
+No se alteran las propiedades del indicador en cuanto estamos tomando un delta, osea un cambio porcentual que no depende del año base. 
+
+
+## Inciso D
+Exporta la xts a csv
+
+Exportamos la base
+
+```{r}
+write.zoo(MoM,file="MoM.csv", sep=",")
+```
+
+
+
+
+
+
+
+
