@@ -1,0 +1,531 @@
+---
+title: "Tarea 1 TS"
+author: "Federico Daverio"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    number_sections: no
+    theme: united
+    highlight: tango
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list = ls())
+options(scipen=999) 
+memory.limit(size=56000)
+library(tidyverse)
+library(stargazer)
+library(Synth)
+library(ggplot2)
+
+setwd('C:/DAVE2/CIDE/4 semestre/Time series/Tarea_1')
+```
+
+
+# Exercise 1
+
+## Video 1
+
+No exercise
+
+## Video 2
+
+No exercise
+
+## Video 3
+
+### Square root of 729
+
+```{r}
+sqrt(729)
+```
+### Reminder of $109/25$
+
+```{r}
+109%%25
+```
+## Video 4
+### Create a factor variable with 3 levels and 6 items
+```{r}
+fact<- factor(c("good", "bad", "ugly", "bad", "bad", "bad"))
+
+class(fact)
+
+nlevels(fact)
+
+levels(fact)
+
+```
+
+## Video 5
+### Assuming that you don't know the size of 'ab', get the first and the last element of the vector
+
+```{r}
+ab<- seq(1,293, by=7)
+
+first <- ab[1]
+
+last<- ab[length(ab)]
+
+cat("First element: ", first)
+
+cat(" Last element: ", last)
+
+cat("or: ", ab[c(1, length(ab))])
+```
+## Video 6
+
+### Craete a new directory in tyour computer. Open R-studio and set it as the working directory
+
+```{r}
+setwd('C:/DAVE2/CIDE/4 semestre/Time series/Tarea_1')
+rm(list = ls())
+```
+
+Se borraron todas las variables así de tener en el ambiente solo *a* una vez creada
+
+### Create a new variable 'a' and give it a value
+
+```{r}
+a<-324
+```
+
+### Save an image of your current session in "mySession.RData"
+
+```{r}
+save.image("mySession.RData")
+```
+
+### Delete all the objects in your current work space
+
+```{r}
+rm(list = ls())
+```
+
+### Load back "mySession.RData"
+
+```{r}
+load("mySession.RData")
+```
+
+## Video 7
+
+### Create this pattern $1,1,1,2,2,3,4,4,4,4$
+
+```{r}
+c(rep(c(1,2,3), 3:1), rep(4,4))
+
+```
+Or:
+```{r}
+rep(1:4, times=c(3,2,1,4))
+```
+
+
+## Video 8
+
+### Make a numeric vector that repeats the sequence of all odd numbers between 1 to 10 two times, with each number repeated thrice
+
+```{r}
+rep(seq(1,10, by=2),each=3, times=2)
+```
+
+## Video 10
+
+Remove all the even numbers and the missing values from 'a'
+
+```{r}
+a<-c(1:5,1:4,NA)
+
+a[!(a%%2==0)& !is.na(a)]
+
+```
+
+## Video 12
+Create a vector(*v1*) using random numbers. Then convert that factor vector to its corresponding numeric vector (*v2*). All values in *v1* and *v2* should match.
+
+```{r}
+v1 <- factor(round(runif(30,30,50)))
+v1
+v2<- as.numeric(as.character(v1))
+v2
+v1==v2
+
+```
+
+
+## Video 13
+
+### Create a list *l2* with a numeric c(1,2,3) and character vector c('a','b','c')
+
+```{r}
+l2<- list(c(1,2,3), c("a","b","c"))
+```
+
+
+### Give names to the vectors in list *l2*
+```{r}
+names(l2)<-c("numbers", "characters")
+names(l2)
+```
+### Extract item "c" from the list using both notation ("$" and "[]")
+
+```{r}
+l2[[2]][3]
+l2$characters[3]
+```
+
+
+## Video 14
+
+### Get the non-repeating elements between a and b
+
+```{r}
+a<-c(11:15)
+b<-c(13:17)
+
+setdiff(union(a,b), intersect(a,b))
+
+```
+
+## Video 16
+
+### Create a numeric vector of length 20, representing height of children entering a theme park. Let the heights lie between 1ft to 6 ft. If the height > 3ft, the entry is free else the entry is paid. 
+
+```{r}
+heights <- round(runif(20,1,6),1)
+
+ifelse(heights>3, "free entry", "yuou need to pay")
+
+```
+## Video 17
+### Create a for loop that pints alphabets from a to z
+
+```{r}
+for (i in letters){
+  print(i)
+}
+```
+
+## Video 18.1
+
+No exercise
+
+## Video 18.2
+
+No exercise
+
+## Video 19
+
+### Exercise 1: Craete a dataframe with 5 columns and 100 rows. Each of the columns should contain random numbers between 1 and 10
+
+```{r}
+a<- round(runif(100, 1,10))
+b<- round(runif(100, 1,10))
+c<- round(runif(100, 1,10))
+d<- round(runif(100, 1,10))
+e<- round(runif(100, 1,10))
+
+db <- data.frame(a,b,c,d,e)
+
+head(db,10)
+```
+### Exercise 2: Insert 5 missing values in each of the 5 columns at random locations
+
+```{r}
+for (i in 1:5){
+  db[sample(1:100,5),i]=NA
+}
+
+summary(db)
+
+```
+### Exercise 3: Get the row numbers that contain missing values in the first column.
+
+```{r}
+which(is.na(db$a))
+
+```
+### Exercise 4: Get the row number that contain missing values in any of the columns
+
+```{r}
+vec<- vector()
+for (i in 1:ncol(db)){
+  vec<-c(vec, which(is.na(db[,i])))
+}
+
+sort(unique(vec))
+length(unique(vec))
+```
+### Exercise 5: Get the elements of 3rd and 5th column in the last 10 rows of db
+
+```{r}
+db[ 91:100,c(3,5)]
+```
+
+### Exercise 6: Sort the db such that the first column is sorted in ascending while second column is sorted in descending order.
+
+```{r}
+db[order(db$a,-db$b),]
+```
+
+
+## Video 20
+
+### Challenge 1: Exctract the 25% of states (in rownames) with least arrests due to murder
+
+```{r}
+library(datasets)
+USArrests
+
+USArrests[USArrests$Murder<summary(USArrests$Murder)[2], 0]
+
+
+
+```
+
+Podemos tambien hacerlo de esta manera:
+
+```{r}
+USArrests[order(USArrests$Murder),]
+
+q1<-nrow(USArrests)/4
+
+USArrests[c(1:round(q1)),]
+```
+
+Notamos que hay una diferencia de un estado dado por la función *round*.
+
+### Chaollenge 2: Extract the states whose Assalut is >200 or rape > 20
+
+```{r}
+USArrests[USArrests$Assault>200 | USArrests$Rape>20,0]
+```
+
+# Exercise 2.1
+
+## Number 1
+For poker_vector: On Monday you won 140 dls, Tuesday you lost 50 dls, Wednesday you won 20 dls, Thursday you lost 120 dls and Friday you won 240 dls.
+
+```{r}
+poker_vector<-c(140,-50,20,-120,240)
+```
+
+
+## Number 2
+For roulette_vector: On Monday you lost 24 dls, Tuesday you lost 50 dls, Wednesday you won 100 dls, Thursday you lost 350 dls and Friday you won 10 dls
+
+
+```{r}
+roulette_vector<-c(-24,-50,100,-350,10)
+```
+
+## Number 3
+Assign days as names of poker_vector
+
+```{r}
+names(poker_vector)<-c("Monday", "Tuesday", "Wednesday","Thursday", "Friday")
+
+poker_vector
+```
+
+## Number 4
+Assign days as names of roulette_vectors
+
+```{r}
+names(roulette_vector)<-c("Monday", "Tuesday", "Wednesday","Thursday","Friday")
+roulette_vector
+```
+## Number 5
+Assign the days of the week vector to a variable
+
+```{r}
+days_vector<-names(poker_vector)
+
+days_vector
+```
+## Number 6
+Calculate your total winnings (Hint - you have to do arithmetic calculations on vectors)
+
+### Point A
+How much has been your overall profit or loss per day of the week?
+
+```{r}
+for (i in days_vector){
+  cat("Winning in ", i, (poker_vector[names(poker_vector)==i]+roulette_vector[names(roulette_vector)==i]), "\n")
+}
+```
+O más sencillo:
+
+```{r}
+poker_vector+roulette_vector
+```
+
+
+
+### Point B
+Have you lost money over the week in total?
+
+```{r}
+cat("My money at the end of the week: ", sum(poker_vector,roulette_vector))
+```
+Estamos por lo tanto perdiendo 84 dolares en la semana
+
+O utilizando el hint:
+
+```{r}
+tot_vector<-poker_vector+roulette_vector
+sum(tot_vector)
+```
+
+### Point C
+Are you winning/losing money on poker or on roulette?
+
+```{r}
+cat("Winning/Losing on poker: ", sum(poker_vector), "\n")
+
+cat("Winning/Losing on roulette poker: ", sum(roulette_vector))
+```
+Estamos ganando dinero en el poker y perdiendo dinero en la roulette
+
+### Point D
+To do it: add the poker_vector and roulette_vector and assign it to total_vector
+
+```{r}
+total_vector<-poker_vector + roulette_vector
+sum(total_vector)
+```
+
+## Number 7
+You wonder if there may be a very tiny chance you have lost money over the week in total? A function that helps you to answer this question is sum(). It calculates the sum of all elements of a vector.
+
+### Point A
+Calculate the total amount of money that you have won/lost with roulette and
+poker and assign to the variable... total_roulette and total_poker
+
+```{r}
+total_poker<-sum(poker_vector)
+total_poker
+total_roulette<-sum(roulette_vector)
+total_roulette
+```
+
+### Point B
+Now that you have the totals for roulette and poker, you can easily calculate total_week (which is the sum of all gains and losses of the week).
+
+```{r}
+total_week<-sum(total_poker,total_roulette)
+```
+
+## Number 8
+Check if your total gains in poker are higher than for roulette by using a comparison. Simply print out the result of this comparison. What do you conclude, should you focus on roulette or on poker?
+
+```{r}
+total_poker>total_roulette
+```
+Estamos ganando más con el poker. Si nuestra función de utilidad depende solo de las ganancias deberíamos concentrarnos en el poker.
+
+## Number 9
+Select the first three elements in poker_vector by using their names: "Monday", "Tuesday" and "Wednesday". Assign the result of the selection to poker_start.
+
+```{r}
+poker_start<- poker_vector[c("Monday", "Tuesday", "Thursday")]
+poker_start
+```
+## Number 10
+Calculate the average of the values in poker_start with the mean() function
+
+```{r}
+mean(poker_start)
+```
+
+# Exercis 2.2
+Construct a data frame that describes the main characteristics of eight planets in our solar system.
+
+* Name "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"
+```{r}
+Name<-c("Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune")
+```
+
+* The type of planet… "Terrestrial planet", "Terrestrial planet", "Terrestrial planet", "Terrestrial planet", "Gas giant", "Gas giant", "Gas giant", "Gas giant"
+
+```{r}
+Type<- c("Terrestrial planet", "Terrestrial planet", "Terrestrial planet", "Terrestrial planet", "Gas giant", "Gas giant", "Gas giant", "Gas giant")
+```
+
+* The planet's diameter relative to the diameter of the Earth. 0.382, 0.949, 1, 0.532, 11.209, 9.449, 4.007, 3.883
+
+```{r}
+Diameter <- c(0.382, 0.949, 1, 0.532, 11.209, 9.449, 4.007, 3.883)
+```
+
+* The planet's rotation across the sun relative to that of the Earth. 58.64, -243.02, 1, 1.03, 0.41, 0.43, -0.72, 0.67
+
+```{r}
+Rotation <- c(58.64, -243.02, 1, 1.03, 0.41, 0.43, -0.72, 0.67)
+```
+
+* if the planet has rings or not (TRUE or FALSE).. FALSE, FALSE, FALSE, FALSE, TRUE,TRUE, TRUE, TRUE)
+
+```{r}
+Rings <- c(FALSE, FALSE, FALSE, FALSE, TRUE,TRUE, TRUE, TRUE)
+```
+
+* Use the function data.frame() to construct a data frame. Pass the vectors name, type, diameter, rotation and rings as arguments to data.frame()
+
+```{r}
+Planets<- data.frame(Name, Type, Diameter,Rotation, Rings )
+Planets
+
+```
+
+# Exercise 2.3.1
+
+* Set a speed of 64
+
+```{r}
+speed<-64
+```
+
+* Code a while loop with the following characteristics:
+ - The condition of the while loop should check if speed is higher than 30.
+ - Inside the body of the while loop, print out "Slow down!".
+ - Inside the body of the while loop, decrease the speed by 7 units and assign this new value to speed again.
+ 
+```{r}
+while(speed>30){
+  print("Slow down!")
+  speed= speed-7
+}
+
+print("Now your speed is legal!")
+```
+# Exercise 2.3.2 
+
+* Add code to the for loop that loops over the elements of the linkedin vector:
+* linkedin <- c(16, 9, 13, 5, 2, 17, 14)
+
+```{r}
+linkedin <- c(16, 9, 13, 5, 2, 17, 14)
+```
+
+* If the vector element's value exceeds 10, print out "You're popular!".
+* If the vector element's value does not exceed 10, print out "Be more visible!
+
+```{r}
+for(i in linkedin){
+  ifelse(i>10, print("You're popular!"),print("Be more visible!"))
+}
+
+
+```
+ 
+ 
